@@ -1,6 +1,11 @@
 {-# OPTIONS_GHC -fno-warn-orphans #-}
 {-# LANGUAGE TypeFamilies      #-}
 {-# LANGUAGE FlexibleInstances #-}
+{-# LANGUAGE DataKinds             #-}
+{-# LANGUAGE DeriveDataTypeable    #-}
+{-# LANGUAGE FlexibleContexts      #-}
+{-# LANGUAGE FlexibleInstances     #-}
+{-# LANGUAGE GADTs                 #-}
 {-# LANGUAGE MultiParamTypeClasses #-}
 {-# LANGUAGE ScopedTypeVariables #-}
 {-# LANGUAGE GADTs               #-}
@@ -167,6 +172,7 @@ import Control.Applicative (Applicative(..),(<$>))
 import Control.DeepSeq     (NFData(..))
 import Data.Data           (Typeable,Data)
 import Data.Monoid         (Monoid(..))
+import Data.Semigroup      (Semigroup(..))
 import qualified Data.Foldable    as F
 import qualified Data.Traversable as T
 import Foreign.Storable (Storable(..))
@@ -310,6 +316,11 @@ instance (Arity n, Monoid a) => Monoid (VecList n a) where
   {-# INLINE mempty  #-}
   {-# INLINE mappend #-}
 
+instance (Arity n, Semigroup a) => Semigroup (VecList n a) where
+  (<>) = zipWith (<>)
+  {-# INLINE (<>) #-}
+
+
 instance (Storable a, Arity n) => Storable (VecList n a) where
   alignment = defaultAlignemnt
   sizeOf    = defaultSizeOf
@@ -336,6 +347,10 @@ instance T.Traversable Only where
 instance Monoid a => Monoid (Only a) where
   mempty = Only mempty
   Only a `mappend` Only b = Only $ mappend a b
+
+instance (Semigroup a) => Semigroup (Only a) where
+  Only a <> Only b = Only (a <> b)
+  {-# INLINE (<>) #-}
 
 instance NFData a => NFData (Only a) where
   rnf (Only a) = rnf a

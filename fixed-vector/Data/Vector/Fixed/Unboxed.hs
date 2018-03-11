@@ -28,6 +28,7 @@ import Control.DeepSeq (NFData(..))
 import Data.Complex
 import Data.Monoid     (Monoid(..))
 import Data.Data
+import Data.Semigroup  (Semigroup(..))
 import Data.Int        (Int8, Int16, Int32, Int64 )
 import Data.Word       (Word,Word8,Word16,Word32,Word64)
 import Foreign.Storable (Storable(..))
@@ -101,6 +102,10 @@ instance (Unbox n a, Monoid a) => Monoid (Vec n a) where
   mappend = zipWith mappend
   {-# INLINE mempty  #-}
   {-# INLINE mappend #-}
+
+instance (Unbox n a, Semigroup a) => Semigroup (Vec n a) where
+  (<>) = zipWith (<>)
+  {-# INLINE (<>) #-}
 
 instance (Typeable n, Unbox n a, Data a) => Data (Vec n a) where
   gfoldl       = C.gfoldl

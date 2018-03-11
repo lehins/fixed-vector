@@ -1,5 +1,8 @@
 {-# LANGUAGE StandaloneDeriving    #-}
 {-# LANGUAGE TypeFamilies          #-}
+{-# LANGUAGE DataKinds             #-}
+{-# LANGUAGE DeriveDataTypeable    #-}
+{-# LANGUAGE FlexibleContexts      #-}
 {-# LANGUAGE FlexibleInstances     #-}
 {-# LANGUAGE MultiParamTypeClasses #-}
 {-# LANGUAGE ScopedTypeVariables   #-}
@@ -26,6 +29,7 @@ import Control.Monad
 import Control.DeepSeq (NFData(..))
 import Data.Data
 import Data.Monoid              (Monoid(..))
+import Data.Semigroup           (Semigroup(..))
 import Data.Primitive.ByteArray
 import Data.Primitive
 import qualified Foreign.Storable as Foreign (Storable(..))
@@ -123,6 +127,11 @@ instance (Arity n, Prim a, Monoid a) => Monoid (Vec n a) where
   mappend = zipWith mappend
   {-# INLINE mempty  #-}
   {-# INLINE mappend #-}
+
+instance (Arity n, Prim a, Semigroup a) => Semigroup (Vec n a) where
+  (<>) = zipWith (<>)
+  {-# INLINE (<>) #-}
+
 
 instance (Typeable n, Arity n, Prim a, Data a) => Data (Vec n a) where
   gfoldl       = C.gfoldl

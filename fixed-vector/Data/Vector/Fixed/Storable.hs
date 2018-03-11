@@ -1,5 +1,8 @@
 {-# LANGUAGE StandaloneDeriving    #-}
 {-# LANGUAGE TypeFamilies          #-}
+{-# LANGUAGE DataKinds             #-}
+{-# LANGUAGE DeriveDataTypeable    #-}
+{-# LANGUAGE FlexibleContexts      #-}
 {-# LANGUAGE FlexibleInstances     #-}
 {-# LANGUAGE MultiParamTypeClasses #-}
 {-# LANGUAGE ScopedTypeVariables   #-}
@@ -27,6 +30,7 @@ module Data.Vector.Fixed.Storable (
 import Control.Monad.Primitive
 import Control.DeepSeq (NFData(..))
 import Data.Monoid           (Monoid(..))
+import Data.Semigroup        (Semigroup(..))
 import Data.Data
 import Foreign.Ptr           (castPtr)
 import Foreign.Storable
@@ -167,6 +171,10 @@ instance (Arity n, Storable a, Monoid a) => Monoid (Vec n a) where
   mappend = zipWith mappend
   {-# INLINE mempty  #-}
   {-# INLINE mappend #-}
+
+instance (Arity n, Storable a, Semigroup a) => Semigroup (Vec n a) where
+  (<>) = zipWith (<>)
+  {-# INLINE (<>) #-}
 
 instance (Arity n, Storable a) => Storable (Vec n a) where
   sizeOf    _ = arity (undefined :: n) * sizeOf (undefined :: a)
