@@ -1,6 +1,9 @@
 {-# LANGUAGE CPP                   #-}
 {-# LANGUAGE StandaloneDeriving    #-}
 {-# LANGUAGE TypeFamilies          #-}
+{-# LANGUAGE DataKinds             #-}
+{-# LANGUAGE DeriveDataTypeable    #-}
+{-# LANGUAGE FlexibleContexts      #-}
 {-# LANGUAGE FlexibleInstances     #-}
 {-# LANGUAGE MultiParamTypeClasses #-}
 {-# LANGUAGE ScopedTypeVariables   #-}
@@ -23,6 +26,7 @@ import Control.Applicative  (Applicative(..))
 import Control.DeepSeq      (NFData(..))
 import Data.Primitive.Array
 import Data.Monoid          (Monoid(..))
+import Data.Semigroup       (Semigroup(..))
 import Data.Data
 import qualified Data.Foldable    as F
 import qualified Data.Traversable as T
@@ -149,6 +153,10 @@ instance (Arity n, Monoid a) => Monoid (Vec n a) where
   mappend = zipWith mappend
   {-# INLINE mempty  #-}
   {-# INLINE mappend #-}
+
+instance (Arity n, Semigroup a) => Semigroup (Vec n a) where
+  (<>) = zipWith (<>)
+  {-# INLINE (<>) #-}
 
 instance Arity n => Functor (Vec n) where
   {-# INLINE fmap #-}
